@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuantumB Data Flow — Data Analytics, AI Engineering & Automation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1:#160B05;
+    --bg-2:#241207;
+    --bg-3:#37200F;
+    --copper:#D98A4A;
+    --copper-deep:#A85A2C;
+    --gold:#F5BE4F;
+    --gold-light:#FFE1A0;
+    --cream:#F4E9D6;
+    --cream-light:#FBF4E7;
+    --glass:rgba(244,233,214,0.05);
+    --glass-border:rgba(244,233,214,0.10);
+    --line:rgba(244,233,214,0.14);
+    --shadow-lg:0 30px 60px -20px rgba(0,0,0,0.55);
+    --shadow-sm:0 10px 24px -12px rgba(0,0,0,0.5);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg-1);
+    color:var(--cream);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .mono{
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    font-size:0.78rem;
+  }
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;position:relative;z-index:2;}
+
+  .gold-text{
+    background:linear-gradient(120deg,var(--gold-light) 0%,var(--gold) 45%,var(--copper) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  /* NAV */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(22,11,5,0.72);
+    backdrop-filter:blur(14px) saturate(140%);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 28px;max-width:1120px;margin:0 auto;
+  }
+  .logo{
+    font-family:'Fraunces',serif;font-weight:700;font-size:1.15rem;
+  }
+  .logo span{color:var(--cream);font-weight:400;}
+  .nav-links{display:flex;gap:32px;list-style:none;}
+  .nav-links a{
+    color:var(--cream);font-size:0.92rem;font-weight:500;
+    transition:color 0.2s;
+  }
+  .nav-links a:hover{color:var(--gold);}
+  .nav-cta{
+    background:linear-gradient(135deg,var(--gold-light),var(--gold) 55%,var(--copper-deep));
+    color:var(--bg-1);
+    padding:10px 20px;border-radius:8px;font-weight:700;font-size:0.86rem;
+    box-shadow:0 6px 16px -4px rgba(217,138,74,0.55), inset 0 1px 0 rgba(255,255,255,0.4);
+    transition:transform 0.15s, box-shadow 0.15s;
+  }
+  .nav-cta:hover{transform:translateY(-1px);box-shadow:0 10px 22px -6px rgba(217,138,74,0.65), inset 0 1px 0 rgba(255,255,255,0.4);}
+  .menu-btn{display:none;background:none;border:none;color:var(--cream);font-size:1.5rem;cursor:pointer;}
+
+  /* HERO - layered mesh glow for depth */
+  .hero{
+    position:relative;
+    padding:130px 0 110px;
+    overflow:hidden;
+  }
+  .hero-mesh{
+    position:absolute;inset:0;z-index:0;
+    background:
+      radial-gradient(600px 400px at 82% -10%, rgba(245,190,79,0.20), transparent 60%),
+      radial-gradient(500px 380px at 10% 30%, rgba(168,90,44,0.25), transparent 65%),
+      radial-gradient(700px 500px at 60% 110%, rgba(217,138,74,0.14), transparent 60%);
+  }
+  .hero-grid{
+    position:absolute;inset:0;z-index:0;opacity:0.35;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px;
+    mask-image:radial-gradient(circle at 70% 20%, black, transparent 65%);
+  }
+  .eyebrow{
+    color:var(--copper);margin-bottom:20px;display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{
+    content:"";width:22px;height:1px;background:var(--copper);display:inline-block;
+  }
+  .hero h1{
+    font-size:clamp(2.3rem,5vw,3.7rem);
+    max-width:820px;
+    line-height:1.08;
+    margin-bottom:26px;
+    text-shadow:0 8px 40px rgba(245,190,79,0.15);
+  }
+  .hero p{
+    max-width:560px;font-size:1.08rem;color:var(--cream);opacity:0.85;margin-bottom:38px;
+  }
+  .btn-row{display:flex;gap:16px;flex-wrap:wrap;}
+  .btn{
+    padding:15px 28px;border-radius:10px;font-weight:700;font-size:0.95rem;
+    display:inline-block;transition:transform 0.18s, box-shadow 0.18s;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg,var(--gold-light),var(--gold) 55%,var(--copper-deep));
+    color:var(--bg-1);
+    box-shadow:0 12px 26px -8px rgba(217,138,74,0.6), inset 0 1px 0 rgba(255,255,255,0.45);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 34px -8px rgba(217,138,74,0.7), inset 0 1px 0 rgba(255,255,255,0.45);}
+  .btn-outline{
+    color:var(--cream);
+    background:var(--glass);
+    border:1px solid var(--glass-border);
+    backdrop-filter:blur(10px);
+  }
+  .btn-outline:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px);}
+
+  /* NODE DIVIDER (signature element) */
+  .node-divider{
+    display:flex;align-items:center;padding:38px 0;position:relative;
+  }
+  .node-divider .wrap{display:flex;align-items:center;gap:14px;width:100%;}
+  .node-dot{
+    width:10px;height:10px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--gold-light), var(--copper) 75%);
+    box-shadow:0 0 16px 2px rgba(245,190,79,0.55);
+    flex-shrink:0;
+  }
+  .node-line{flex:1;height:1px;background:linear-gradient(90deg, transparent, var(--line) 20%, var(--line) 80%, transparent);}
+  .node-label{
+    font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--copper);
+    text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;
+  }
+
+  /* SERVICES - glass cards with 3D tilt */
+  .services{padding:70px 0 100px;position:relative;}
+  .section-head{max-width:600px;margin-bottom:52px;}
+  .section-head h2{font-size:2.1rem;margin-bottom:14px;}
+  .section-head p{color:var(--cream);opacity:0.72;}
+  .service-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:22px;
+    perspective:1400px;
+  }
+  .service-card{
+    background:linear-gradient(160deg, rgba(244,233,214,0.07), rgba(244,233,214,0.015));
+    border:1px solid var(--glass-border);
+    border-radius:14px;
+    padding:34px 26px;
+    position:relative;
+    backdrop-filter:blur(6px);
+    box-shadow:var(--shadow-sm);
+    transition:transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  }
+  .service-card:hover{
+    transform:translateY(-6px) rotateX(2deg);
+    border-color:rgba(245,190,79,0.4);
+    box-shadow:var(--shadow-lg), 0 0 0 1px rgba(245,190,79,0.15);
+  }
+  .service-card::before{
+    content:"";position:absolute;top:0;left:24px;right:24px;height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  }
+  .service-card .mono{color:var(--copper);margin-bottom:22px;display:block;}
+  .service-card h3{font-size:1.25rem;margin-bottom:12px;color:var(--gold-light);}
+  .service-card p{color:var(--cream);opacity:0.78;font-size:0.95rem;}
+
+  /* STACK / PROOF - cream section with depth */
+  .proof{
+    background:linear-gradient(180deg, var(--cream) 0%, var(--cream-light) 100%);
+    color:var(--bg-2);
+    padding:90px 0;
+    position:relative;
+  }
+  .proof .section-head h2{background:linear-gradient(120deg,#3E2416,#A85A2C);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .proof .section-head p{color:#6B4A34;}
+  .stack-row{
+    display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px;
+  }
+  .stack-pill{
+    font-family:'JetBrains Mono',monospace;font-size:0.82rem;
+    background:linear-gradient(160deg,#3E2416,#241207);
+    color:var(--gold-light);
+    padding:9px 18px;border-radius:24px;
+    box-shadow:0 8px 18px -8px rgba(36,18,7,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .case{
+    background:rgba(255,255,255,0.55);
+    border:1px solid rgba(62,36,22,0.12);
+    border-radius:16px;
+    padding:36px;
+    display:grid;grid-template-columns:1fr 2fr;gap:28px;
+    backdrop-filter:blur(8px);
+    box-shadow:0 24px 50px -24px rgba(62,36,22,0.35);
+  }
+  .case .mono{color:var(--copper-deep);margin-bottom:10px;display:block;}
+  .case h3{font-size:1.25rem;margin-bottom:10px;}
+  .case p{color:#5A3D2A;font-size:0.95rem;}
+  .case-tags{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;}
+  .case-tags span{
+    font-size:0.75rem;font-family:'JetBrains Mono',monospace;
+    color:#3E2416;border:1px solid rgba(62,36,22,0.25);
+    padding:4px 10px;border-radius:6px;
+    background:rgba(255,255,255,0.5);
+  }
+  .case a{color:var(--copper-deep);font-weight:700;}
+
+  /* LEARN WITH US - secondary glass band */
+  .learn{
+    position:relative;padding:64px 0;
+    background:linear-gradient(120deg, var(--bg-3), #2A1810);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .learn-inner{
+    display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap;
+  }
+  .learn-text .mono{color:var(--gold);margin-bottom:10px;display:block;}
+  .learn-text h3{font-size:1.55rem;color:var(--cream-light);margin-bottom:10px;max-width:480px;}
+  .learn-text p{color:var(--cream);opacity:0.75;max-width:480px;font-size:0.95rem;}
+  .learn .btn-outline{border-color:rgba(245,190,79,0.4);color:var(--gold);flex-shrink:0;}
+  .learn .btn-outline:hover{background:linear-gradient(135deg,var(--gold-light),var(--copper-deep));color:var(--bg-1);}
+
+  /* ABOUT */
+  .about{padding:100px 0;position:relative;}
+  .about-grid{
+    display:grid;grid-template-columns:0.9fr 1.1fr;gap:56px;align-items:center;
+  }
+  .about-badge{
+    width:100%;aspect-ratio:1/1;max-width:280px;
+    border-radius:20px;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(160deg, rgba(244,233,214,0.08), rgba(244,233,214,0.015));
+    border:1px solid var(--glass-border);
+    box-shadow:var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.08);
+    position:relative;
+  }
+  .about-badge span{
+    font-family:'Fraunces',serif;font-size:3.4rem;
+    background:linear-gradient(140deg,var(--gold-light),var(--copper));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .about h2{font-size:1.95rem;margin-bottom:18px;}
+  .about p{color:var(--cream);opacity:0.82;margin-bottom:14px;font-size:0.98rem;}
+
+  /* CONTACT / FOOTER */
+  footer{
+    background:linear-gradient(180deg, var(--bg-1), #0F0703);
+    border-top:1px solid var(--line);
+    padding:80px 0 36px;
+    position:relative;
+  }
+  .footer-head{
+    display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px;
+    margin-bottom:52px;
+  }
+  .footer-head h2{font-size:2.1rem;max-width:480px;}
+  .footer-cols{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;
+    padding-bottom:36px;border-bottom:1px solid var(--line);margin-bottom:24px;
+  }
+  .footer-cols .mono{color:var(--copper);margin-bottom:12px;display:block;}
+  .footer-cols a,.footer-cols p{
+    display:block;color:var(--cream);opacity:0.75;font-size:0.92rem;margin-bottom:8px;
+    transition:color 0.2s, opacity 0.2s;
+  }
+  .footer-cols a:hover{color:var(--gold);opacity:1;}
+  .footer-bottom{
+    display:flex;justify-content:space-between;color:var(--cream);opacity:0.5;font-size:0.82rem;flex-wrap:wrap;gap:10px;
+  }
+
+  @media (max-width:860px){
+    .service-grid{grid-template-columns:1fr;}
+    .case{grid-template-columns:1fr;}
+    .about-grid{grid-template-columns:1fr;}
+    .footer-cols{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+    .menu-btn{display:block;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><span class="gold-text">QuantumB</span><span> Data Flow</span></div>
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#learn">Learn</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Book a consult</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-mesh"></div>
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="eyebrow mono">Lagos built, delivered worldwide</div>
+    <h1 class="gold-text">We build the pipelines, agents and automations behind your data.</h1>
+    <p>QuantumB Data Flow is a data analytics, AI engineering and automation studio. We take businesses in the US, EU, Australia and Nigeria from scattered spreadsheets to systems that run themselves.</p>
+    <div class="btn-row">
+      <a href="#contact" class="btn btn-primary">Book a free consult</a>
+      <a href="#work" class="btn btn-outline">See our work</a>
+    </div>
+  </div>
+</section>
+
+<div class="node-divider">
+  <div class="wrap">
+    <span class="node-dot"></span><span class="node-line"></span>
+    <span class="node-label">Analytics · AI · Automation</span>
+    <span class="node-line"></span><span class="node-dot"></span>
+  </div>
+</div>
+
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="gold-text">What we do</h2>
+      <p>Three services, one team. Most projects end up needing all three working together.</p>
+    </div>
+    <div class="service-grid">
+      <div class="service-card">
+        <span class="mono">01 / Analytics</span>
+        <h3>Data Analytics &amp; Engineering</h3>
+        <p>Pipelines, warehousing and dashboards built with SQL, Python, Airflow, dbt and Power BI. Clean data, delivered on a schedule you can trust.</p>
+      </div>
+      <div class="service-card">
+        <span class="mono">02 / AI</span>
+        <h3>AI Engineering</h3>
+        <p>LLM powered apps and agents built with LangChain and FastAPI, connected to the tools your team already uses.</p>
+      </div>
+      <div class="service-card">
+        <span class="mono">03 / Automation</span>
+        <h3>Workflow Automation</h3>
+        <p>End to end n8n builds that connect your apps, cut manual work and catch errors before they reach a customer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="proof" id="work">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Built on a stack that scales</h2>
+      <p>Every engagement is built with tools your next hire will already recognize.</p>
+    </div>
+    <div class="stack-row">
+      <span class="stack-pill">Python</span>
+      <span class="stack-pill">n8n</span>
+      <span class="stack-pill">FastAPI</span>
+      <span class="stack-pill">LangChain</span>
+      <span class="stack-pill">Azure</span>
+      <span class="stack-pill">GCP</span>
+      <span class="stack-pill">AWS</span>
+      <span class="stack-pill">dbt</span>
+      <span class="stack-pill">Airflow</span>
+      <span class="stack-pill">Kafka</span>
+      <span class="stack-pill">Pyspark</span>
+    </div>
+    <div class="case">
+      <div>
+        <span class="mono">Case study</span>
+        <h3>Cross border e-commerce automation</h3>
+      </div>
+      <div>
+        <p>A six process automation suite connecting a partner marketplace API, a fulfilment API and an AI layer for listing generation and reply handling. Replaced a manual daily workflow with a system that runs unattended.</p>
+        <div class="case-tags">
+          <span>n8n</span><span>OpenAI</span><span>REST APIs</span><span>Google Sheets</span>
+        </div>
+        <a href="https://ezebami04.github.io/EzeBami04.gihub.io/" target="_blank" rel="noopener" style="display:inline-block;margin-top:20px;font-size:0.92rem;">View full portfolio →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="learn" id="learn">
+  <div class="wrap learn-inner">
+    <div class="learn-text">
+      <span class="mono">The teaching arm</span>
+      <h3>Learn With QuantumB</h3>
+      <p>Cohort based bootcamps in data and analytics engineering, taught by the team behind the agency. Real tools, real projects, no filler.</p>
+    </div>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeTwcqql9HLcM7HHI5GVqg3m4mgUSuSnqt9M7AgtUJt8zOF3Q/viewform" class="btn btn-outline">Join Our Wait List</a>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="wrap about-grid">
+    <div class="about-badge"><span>QB</span></div>
+    <div>
+      <h2 class="gold-text">Started in accounting, built for data</h2>
+      <p>QuantumB Data Flow was founded on a simple observation: most businesses do not have a data problem, they have a process problem. The founder's background in accounting, paired with hands on data engineering and automation work, shapes how the studio approaches every project. Numbers first, systems second, dashboards last.</p>
+      <p>Based in Lagos. Working with clients across Nigeria, the US , EU and Australia.</p>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="footer-head">
+      <h2 class="gold-text">Let's talk about your data.</h2>
+      <a href="mailto:hello@quantumbdata.org" class="btn btn-primary">hello@quantumbdata.org</a>
+    </div>
+    <div class="footer-cols">
+      <div>
+        <span class="mono">Studio</span>
+        <a href="#services">Services</a>
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+      </div>
+      <div>
+        <span class="mono">Learn</span>
+        <a href="#learn">Bootcamp</a>
+        <a href="#">Resources</a>
+      </div>
+      <div>
+        <span class="mono">Connect</span>
+        <a href="#">LinkedIn</a>
+        <a href="#">Upwork</a>
+        <a href="#">Fiverr</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 QuantumB Data Flow.</span>
+      <span>Data Analytics · AI Engineering · Automation</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
